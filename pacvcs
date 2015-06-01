@@ -1,0 +1,75 @@
+#!/bin/bash
+
+
+readonly systems="cvs|svn|hg|bzr|git"
+
+readonly esc="\033["
+readonly red="${esc}0;31m"
+readonly green="${esc}0;32m"
+readonly blue="${esc}0;34m"
+readonly yellow="${esc}0;33m"
+readonly NC="${esc}0m"
+
+
+#loop over each output
+pacman -Qem | grep -E "$systems" | while read -r line ; do
+    status_color="${yellow}"
+    
+    
+    package_name=$(echo "$line" | cut -d' ' -f1)
+    package_ver=$(echo "$line" | cut -d' ' -f2)
+    package_url=$(pacman -Qi "$package_name" | grep URL | tr -s ' ' | cut -d' ' -f3)
+
+
+    if echo "$package_url" | grep -i "^git://\|github\|gitlab" >/dev/null 2>&1; then
+        #is a git repo
+        upstream_ver=$(git ls-remote "$package_url" refs/heads/master | tr -s ' ' | cut -f1)
+        up_to_date=false
+
+        matches=$(echo "${package_ver}" | grep -iPo "\bg?\K([a-f0-9]{5,12})\b")
+        have_hash=$?
+    
+        if [ $have_hash -eq 0 ]; then
+            #version name contains hash-looking part
+    
+            #for each match in the installed version that looks like a git hash
+            while read match; do
+                if echo "${upstream_ver}" | grep -iE "^${match}" > /dev/null 2>&1; then
+                    up_to_date=true
+                fi
+            done <<<"$matches"
+    
+            if [ "${up_to_date}" = true ]; then
+                status_color="${green}"
+            else
+                status_color="${red}"
+            fi
+        fi
+
+    elif echo "${package_name}" | grep -i "bzr" >/dev/null 2>&1; then
+        if command -v bzr >/dev/null 2>&1; then
+            upstream_ver=$(bzr revno "${package_url}" 2>/dev/null)
+            our_revno=$(echo "${package_ver}" | grep -iPo "\br\K(\d+)\b")
+            
+            if [ "${our_revno}" == "${upstream_ver}" ]; then
+                status_color="${green}"
+            else
+                status_color="${red}"
+            fi
+
+        else
+            upstream_ver="Unknown; bzr required"
+        fi
+    else
+        upstream_ver="Unknown"
+    fi
+
+    echo -e "${status_color}${package_name}${NC}
+    URL: ${blue}${package_url}${NC}
+    Current version: ${package_ver}
+    Remote  version: ${upstream_ver}
+    "
+    
+done
+
+
