@@ -22,3 +22,9 @@ Here are some URL formats that will work with pacvcs:
 - `https://gitlab.com/o9000/tint2.git`
 
 
+LICENSE
+-------
+
+This code is licensed under the MIT License
+
+Copyright (c) 2015 Dan Panzarella
