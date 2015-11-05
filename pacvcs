@@ -44,7 +44,7 @@ pacman -Qm | grep -E "$systems" | while read -r line ; do
 
     if echo "$package_url" | grep -i "^git://\|github\|gitlab" >/dev/null 2>&1; then
         #is a git repo
-        upstream_ver=$(git ls-remote "$package_url" refs/heads/master | tr -s ' ' | cut -f1)
+        upstream_ver=$(git ls-remote "$package_url" HEAD | head -n1 | tr -s ' ' | cut -f1)
         up_to_date=false
 
         matches=$(echo "${package_ver}" | grep -iPo "\bg?\K([a-f0-9]{5,12})\b")
