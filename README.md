@@ -22,6 +22,14 @@ Here are some URL formats that will work with pacvcs:
 - `https://gitlab.com/o9000/tint2.git`
 
 
+Screenshot
+----------
+
+Example output:
+
+![screenshot](http://pzl.github.io/pacvcs/screenshot.png)
+
+
 LICENSE
 -------
 
