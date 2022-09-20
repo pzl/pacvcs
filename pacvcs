@@ -21,8 +21,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE. 
 
-
-readonly systems="cvs|svn|hg|bzr|git"
+readonly systems="cvs |svn |hg |bzr |git "
 
 readonly esc="\033["
 readonly red="${esc}0;31m"
@@ -33,7 +32,7 @@ readonly NC="${esc}0m"
 
 
 #loop over each output
-pacman -Qm | grep -E "$systems" | while read -r line ; do
+pacman -Qm | grep -E "${systems}" | while read -r line; do
     status_color="${yellow}"
     
     
